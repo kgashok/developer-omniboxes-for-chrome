@@ -23,6 +23,7 @@ var navigate = function(url) {
 
 // Prefetch necessary data
 var predefined_ = {
+	"list.":"https://j.mp/listThis",
 	"glossary":"https://j.mp/pyGlossary", 
 	"unit4":"https://j.mp/unit4Easy",
 	"assert":"reference/simple_stmts.html#the-assert-statement",

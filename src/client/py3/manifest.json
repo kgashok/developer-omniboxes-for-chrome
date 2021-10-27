@@ -11,7 +11,7 @@
 		"16" : "icon16.png"
 	},
 	"omnibox" : {
-		"keyword" : "py"
+		"keyword" : "py3"
 	},
 	"permissions" : [ 
 		"tabs", 

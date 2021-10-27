@@ -267,20 +267,13 @@
                 console.log("Received: "+url);
                 modules_ = {};
                 var text = req.responseText;
-                console.log(text.substr(0, 1000));
                 //var matches = text.match(new RegExp('<a href=\"library/[^\"]*.html#module-[^\"]*\"><tt class=\"xref\">[^<]*</tt></a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?', "g"));
-                //var matches = text.match(
-                //    new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a><\/td><td>\(\
-                //        <em>[^<]*<\/em>)?', "g"));
                 var matches = text.match(
-                    //new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?', "g"));
-                    //new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a><\/td><td>\(\
-                    //    <em>\\(.*\\)<\/em>)?', "g"));
                     new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a><\/td><td>\n?.*<em>[^<]*<\/em>', "g"));
                             
                 if (matches) {
                     for (var i = 0; matches !== null && i < matches.length; ++i) {
-                        console.log(matches[i]);
+                        // console.log(matches[i]);
                         var match = matches[i];
                         var hrefstartidx = match.indexOf("href=\"") + 6;
                         var hrefendidx = match.indexOf("\"", hrefstartidx);
