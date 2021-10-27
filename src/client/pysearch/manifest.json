@@ -1,0 +1,21 @@
+{
+   "name": "PySearch",
+   "manifest_version": 2,
+   "background": {
+      "scripts": [ "config.js", "indexer.js", "renderer.js", "index-data.js", "background.js" ]
+   },
+   "description": "Search Python documentation in the Omnibox.",
+   "icons": {
+      "128": "python-logo-128.png",
+      "16": "python-logo-16.png",
+      "48": "python-logo-48.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8UndmGBmhRg2e0wiRg4ldSc/cw2OB4+37dJVlavjVXlHNPdmWNqF0MsJ4h3WtHQHwzPQnY8OyCk9j7ZYb3+XVDwoeBWQgrkedRrA71nwH78fXksIfbJetx9BUeZumu3Rzx+AbH6/KcD+xLOCuJ4L40tIox+wq17SuOzd0VKJWTQIDAQAB",
+   "minimum_chrome_version": "18",
+   "omnibox": {
+      "keyword": "py"
+   },
+   "permissions": [ "tabs", "http://docs.python.org/" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.2.2"
+}

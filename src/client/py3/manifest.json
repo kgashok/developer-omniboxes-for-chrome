@@ -15,7 +15,11 @@
 	},
 	"permissions" : [ 
 		"tabs", 
-		"http://docs.python.org/" 
+		"*://docs.python.org/", 
+		"*://docs.scipy.org/", 
+		"*://docs.sympy.org/", 
+		"*://matplotlib.sourceforge.net/", 
+		"*://pylonshq.com/"
 	],
 	"version": "3.0.0"
 }
