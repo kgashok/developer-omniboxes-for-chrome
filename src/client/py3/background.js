@@ -273,7 +273,10 @@
                 //    new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a><\/td><td>\(\
                 //        <em>[^<]*<\/em>)?', "g"));
                 var matches = text.match(
-                    new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?', "g"));
+                    //new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?', "g"));
+                    new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a><\/td><td>\(\
+                        <em>\\(.*\\)<\/em>)?', "g"));
+                        
                 if (matches) {
                     for (var i = 0; matches !== null && i < matches.length; ++i) {
                         console.log(matches[i]);
