@@ -256,8 +256,8 @@
         if (localStorage.hasOwnProperty('python_modules')) {
             modules_ = localStorage.getObject('python_modules');
         } else {
-            var tt_start = new RegExp("<tt class=\"xref\">", "g");
-            var tt_end = new RegExp("</tt></a>", "g");
+            var tt_start = new RegExp("<code class=\"xref\">", "g");
+            var tt_end = new RegExp("</code></a>", "g");
             var em_start = new RegExp("<em>", "g");
             var em_end = new RegExp("</em>", "g");
             var td = new RegExp("</td><td>", "g");
@@ -267,27 +267,37 @@
                 console.log("Received: "+url);
                 modules_ = {};
                 var text = req.responseText;
-                var matches = text.match(new RegExp("<a href=\"library/[^\"]*.html#module-[^\"]*\"><tt class=\"xref\">[^<]*</tt></a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?", "g"));
-                for (var i = 0; matches !== null && i < matches.length; ++i) {
-                    var match = matches[i];
-                    var hrefstartidx = match.indexOf("href=\"") + 6;
-                    var hrefendidx = match.indexOf("\"", hrefstartidx);
-                    var href = match.substring(hrefstartidx, hrefendidx);
-                    var namestartidx = match.indexOf("\"xref\">") + 7;
-                    var nameendidx = match.indexOf("</tt>", namestartidx);
-                    var name = match.substring(namestartidx, nameendidx);
-                    var fullurl = "http://docs.python.org/3/" + href;
-                    var description = [match.substr(match.indexOf("<tt"))
-                                            .replace(tt_start, "<match>")
-                                            .replace(tt_end, "</match>")
-                                            .replace(em_start, "<dim>")
-                                            .replace(em_end, "</dim>")
-                                            .replace(td, "")
-                                            .replace(deprecated, " <match>[DEPRECATED]</match>"),
-                                        " - <url>", fullurl, "</url>"].join('');
-                    modules_[name.toLowerCase()] = {"name":name, "url":fullurl, "description":description};
+                console.log(text.substr(0, 1000));
+                //var matches = text.match(new RegExp('<a href=\"library/[^\"]*.html#module-[^\"]*\"><tt class=\"xref\">[^<]*</tt></a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?', "g"));
+                //var matches = text.match(
+                //    new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a><\/td><td>\(\
+                //        <em>[^<]*<\/em>)?', "g"));
+                var matches = text.match(
+                    new RegExp('<a href=\"library\/[^\"]*.html#module-[^\"]*\"><code class=\"xref\">[^<]*<\/code><\/a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?', "g"));
+                if (matches) {
+                    for (var i = 0; matches !== null && i < matches.length; ++i) {
+                        console.log(matches[i]);
+                        var match = matches[i];
+                        var hrefstartidx = match.indexOf("href=\"") + 6;
+                        var hrefendidx = match.indexOf("\"", hrefstartidx);
+                        var href = match.substring(hrefstartidx, hrefendidx);
+                        var namestartidx = match.indexOf("\"xref\">") + 7;
+                        var nameendidx = match.indexOf("</code>", namestartidx);
+                        var name = match.substring(namestartidx, nameendidx);
+                        var fullurl = "http://docs.python.org/3/" + href;
+                        var description = [match.substr(match.indexOf("<code"))
+                                                .replace(tt_start, "<match>")
+                                                .replace(tt_end, "</match>")
+                                                .replace(em_start, "<dim>")
+                                                .replace(em_end, "</dim>")
+                                                .replace(td, "")
+                                                .replace(deprecated, " <match>[DEPRECATED]</match>"),
+                                            " - <url>", fullurl, "</url>"].join('');
+                        modules_[name.toLowerCase()] = {"name":name, "url":fullurl, "description":description};
+                        console.log("***", modules_[name.toLowerCase()]);
+                    }
+                    localStorage.setObject('python_modules', modules_);
                 }
-                localStorage.setObject('python_modules', modules_);
             },
             function(url, req) {
                 console.log("Failed to receive: "+url);
