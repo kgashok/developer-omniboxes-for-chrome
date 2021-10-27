@@ -36,6 +36,15 @@
             chrome.omnibox.setDefaultSuggestion({"description":"<url><match>Python3 Search</match></url>"});
         }
     };
+
+    Storage.prototype.setObject = function(key, value) {
+        this.setItem(key, JSON.stringify(value));
+    }
+    
+    Storage.prototype.getObject = function(key) {
+        var value = this.getItem(key);
+        return value && JSON.parse(value);
+    }
     
     // Prefetch necessary data
     var predefined_ = {
@@ -94,45 +103,52 @@
     var exceptions_ = null;
     var datamodel_ = null;
     var modules_ = null;
+    
     chrome.omnibox.onInputStarted.addListener(function(){
         console.log("Input started");
         setDefaultSuggestion('');
         
-        if (localStorage.hasUnexpired('python_builtin_functions')) {
+        if (localStorage.hasOwnProperty('python_builtin_functions')) {
             builtin_functions_ = localStorage.getObject('python_builtin_functions');
         } else {
-            xhr("http://docs.python.org/py3k/library/functions.html",
+            xhr("http://docs.python.org/3/library/functions.html",
             function(url, req) {
                 console.log("Received: "+url);
                 builtin_functions_ = {};
-                builtin_functions_["builtin functions"] = {"name":"Builtin Functions", "url":"http://docs.python.org/py3k/library/functions.html"};
+                builtin_functions_["builtin functions"] = {"name":"Builtin Functions", "url":"http://docs.python.org/3/library/functions.html"};
                 var text = req.responseText;
-                var matches = text.match(new RegExp("<a title=\"[^\"]*\" class=\"reference [a-z]*\" href=\"[^\"]*\"><tt class=\"xref docutils literal\"><span class=\"pre\">[^<]*</span></tt></a></td>", "g"));
-                for (var i = 0; i < matches.length; ++i) {
-                    var match = matches[i];
-                    var hrefstartidx = match.indexOf("href=\"") + 6;
-                    var hrefendidx = match.indexOf("\"", hrefstartidx);
-                    var href = match.substring(hrefstartidx, hrefendidx);
-                    var hashidx = href.indexOf("#");
-                    var name = href.substr(hashidx+1);
-                    var url = (hashidx == 0) ? ("http://docs.python.org/py3k/library/functions.html" + href) : ("http://docs.python.org/py3k/library/" + href);
-                    builtin_functions_[name.toLowerCase()] = {"name":name, "url":url};
+                //var matches = text.match(new RegExp("<a title=\"[^\"]*\" class=\"reference [a-z]*\" href=\"[^\"]*\"><tt class=\"xref docutils literal\"><span class=\"pre\">[^<]*</span></tt></a></td>", "g"));
+                var matches = text.match(
+                    new RegExp('<a class=\"[^\"]*\" href=\"[^\"]*\" title=\"[^\"]*"><code class=\"xref py py-func docutils literal notranslate\"><span class=\"pre\">[^<]*<\/span><\/code><\/a>', "g"));
+                console.log(text.substr(100, 200), "**Matches**", matches); 
+                if (matches) {
+                    for (var i = 0; i < matches.length; ++i) {
+                        var match = matches[i];
+                        var hrefstartidx = match.indexOf("href=\"") + 6;
+                        var hrefendidx = match.indexOf("\"", hrefstartidx);
+                        var href = match.substring(hrefstartidx, hrefendidx);
+                        var hashidx = href.indexOf("#");
+                        var name = href.substr(hashidx+1);
+                        var url = (hashidx == 0) ? ("http://docs.python.org/3/library/functions.html" + href) : ("http://docs.python.org/3/library/" + href);
+                        builtin_functions_[name.toLowerCase()] = {"name":name, "url":url};
+                    }
+                    console.log("BUILT-IN", builtin_functions_);
+                    localStorage.setObject('python_builtin_functions', builtin_functions_);
                 }
-                localStorage.setObject('python_builtin_functions', builtin_functions_);
             },
             function (url, req) {
                 console.log("Failed to receive: "+url);
             }).send(null);
         }
         
-        if (localStorage.hasUnexpired('python_constants')) {
+        if (localStorage.hasOwnProperty('python_constants')) {
             constants_ = localStorage.getObject('python_constants');
         } else {
-            xhr("http://docs.python.org/py3k/library/constants.html",
+            xhr("http://docs.python.org/3/library/constants.html",
             function(url, req) {
                 console.log("Received: "+url);
                 constants_ = {};
-                constants_["constants"] = {"name":"Constants", "url":"http://docs.python.org/py3k/library/constants.html"};
+                constants_["constants"] = {"name":"Constants", "url":"http://docs.python.org/3/library/constants.html"};
                 var text = req.responseText;
                 var matches = text.match(new RegExp("<a class=\"headerlink\" href=\"#[^\"]*\" title=\"Permalink to this definition\">[^\"]*</a>", "g"));
                 for (var i = 0; i < matches.length; ++i) {
@@ -150,14 +166,14 @@
             }).send(null);
         }
         
-        if (localStorage.hasUnexpired('python_types')) {
+        if (localStorage.hasOwnProperty('python_types')) {
             types_ = localStorage.getObject('python_types');
         } else {
-            xhr("http://docs.python.org/py3k/library/stdtypes.html",
+            xhr("http://docs.python.org/3/library/stdtypes.html",
             function(url, req) {
                 console.log("Received: "+url);
                 types_ = {};
-                types_["types"] = {"name":"Types", "url":"http://docs.python.org/py3k/library/stdtypes.html"};
+                types_["types"] = {"name":"Types", "url":"http://docs.python.org/3/library/stdtypes.html"};
                 var text = req.responseText;
                 var matches = text.match(new RegExp("<a class=\"headerlink\" href=\"#[^\"]*\" title=\"Permalink to this definition\">[^\"]*</a>", "g"));
                 for (var i = 0; i < matches.length; ++i) {
@@ -175,14 +191,14 @@
             }).send(null);
         }
         
-        if (localStorage.hasUnexpired('python_exceptions')) {
+        if (localStorage.hasOwnProperty('python_exceptions')) {
             exceptions_ = localStorage.getObject('python_exceptions');
         } else {
-            xhr("http://docs.python.org/py3k/library/exceptions.html",
+            xhr("http://docs.python.org/3/library/exceptions.html",
             function(url, req) {
                 console.log("Received: "+url);
                 exceptions_ = {};
-                exceptions_["exceptions"] = {"name":"exceptions", "url":"http://docs.python.org/py3k/library/exceptions.html"};
+                exceptions_["exceptions"] = {"name":"exceptions", "url":"http://docs.python.org/3/library/exceptions.html"};
                 var text = req.responseText;
                 var matches = text.match(new RegExp("<a class=\"headerlink\" href=\"#[^\"]*\" title=\"Permalink to this definition\">[^\"]*</a>", "g"));
                 for (var i = 0; i < matches.length; ++i) {
@@ -205,10 +221,10 @@
             }).send(null);
         }
         
-        if (localStorage.hasUnexpired('python_datamodel')) {
+        if (localStorage.hasOwnProperty('python_datamodel')) {
             datamodel_ = localStorage.getObject('python_datamodel');
         } else {
-            xhr("http://docs.python.org/py3k/reference/datamodel.html",
+            xhr("http://docs.python.org/3/reference/datamodel.html",
             function(url, req) {
                 console.log("Received: "+url);
                 datamodel_ = {};
@@ -237,7 +253,7 @@
             }).send(null);
         }
         
-        if (localStorage.hasUnexpired('python_modules')) {
+        if (localStorage.hasOwnProperty('python_modules')) {
             modules_ = localStorage.getObject('python_modules');
         } else {
             var tt_start = new RegExp("<tt class=\"xref\">", "g");
@@ -246,13 +262,13 @@
             var em_end = new RegExp("</em>", "g");
             var td = new RegExp("</td><td>", "g");
             var deprecated = new RegExp("<strong>Deprecated:</strong>", "g");
-            xhr("http://docs.python.org/py3k/py-modindex.html",
+            xhr("http://docs.python.org/3/py-modindex.html",
             function(url, req) {
                 console.log("Received: "+url);
                 modules_ = {};
                 var text = req.responseText;
                 var matches = text.match(new RegExp("<a href=\"library/[^\"]*.html#module-[^\"]*\"><tt class=\"xref\">[^<]*</tt></a>( <em>\\(.*\\)</em>)?</td><td>(<strong>Deprecated:</strong>)?", "g"));
-                for (var i = 0; i < matches.length; ++i) {
+                for (var i = 0; matches !== null && i < matches.length; ++i) {
                     var match = matches[i];
                     var hrefstartidx = match.indexOf("href=\"") + 6;
                     var hrefendidx = match.indexOf("\"", hrefstartidx);
@@ -260,7 +276,7 @@
                     var namestartidx = match.indexOf("\"xref\">") + 7;
                     var nameendidx = match.indexOf("</tt>", namestartidx);
                     var name = match.substring(namestartidx, nameendidx);
-                    var fullurl = "http://docs.python.org/py3k/" + href;
+                    var fullurl = "http://docs.python.org/3/" + href;
                     var description = [match.substr(match.indexOf("<tt"))
                                             .replace(tt_start, "<match>")
                                             .replace(tt_end, "</match>")
@@ -280,6 +296,7 @@
     });
     
     function fetchModule(moduleobj) {
+        console.log(moduleobj);
         if (moduleobj["moduledata"]) {
             return;
         }
@@ -293,7 +310,7 @@
             var text = req.responseText;
             var matches = text.match(new RegExp("<a class=\"headerlink\" href=\"#[^\"]*\" title=\"Permalink to this definition\">[^<]*</a>", "g"));
             if (matches) {
-                for (var i = 0; i < matches.length; ++i) {
+                for (var i = 0; matches !== null && i < matches.length; ++i) {
                     var match = matches[i];
                     var hrefstartidx = match.indexOf("href=\"") + 6;
                     var hrefendidx = match.indexOf("\"", hrefstartidx);
@@ -321,7 +338,7 @@
             return;
         }
         
-        var kMaxSuggestions = 10;
+        var kMaxSuggestions = 20;
         var suggestions = [];
         var stripped_text = text.strip();
         if (!stripped_text) {
@@ -337,7 +354,7 @@
         
         for (var key in predefined_) {
             if (key.startsWith(qlower)) {
-                var url = "http://docs.python.org/py3k/" + predefined_[key];
+                var url = "http://docs.python.org/3/" + predefined_[key];
                 suggestions.push({"content":url, "description":["<match>", key, "</match> - <url>", url, "</url>"].join('')});
                 if (suggestions.length > kMaxSuggestions) {
                     break;
@@ -495,16 +512,17 @@
         suggest_callback(suggestions);
     });
     
+    // Event handler for when the enter key is pressed within the omnibox.
     chrome.omnibox.onInputEntered.addListener(function(text) {
         console.log("Input entered: " + text);
         if (!text) {
-            nav("http://docs.python.org/py3k/");
+            nav("http://docs.python.org/3/");
             return;
         }
         
         var stripped_text = text.strip();
         if (!stripped_text) {
-            nav("http://docs.python.org/py3k/");
+            nav("http://docs.python.org/3/");
             return;
         }
         var qlower = stripped_text.toLowerCase();
@@ -539,7 +557,7 @@
         }
         
         if (predefined_[qlower]) {
-            nav("http://docs.python.org/py3k/" + predefined_[qlower]);
+            nav("http://docs.python.org/3/" + predefined_[qlower]);
             return;
         }
         
