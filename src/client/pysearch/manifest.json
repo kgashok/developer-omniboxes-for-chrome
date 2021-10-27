@@ -15,7 +15,14 @@
    "omnibox": {
       "keyword": "py"
    },
-   "permissions": [ "tabs", "http://docs.python.org/" ],
+   "permissions" : [ 
+		"tabs", 
+		"*://docs.python.org/", 
+		"*://docs.scipy.org/", 
+		"*://docs.sympy.org/", 
+		"*://matplotlib.sourceforge.net/", 
+		"*://pylonshq.com/"
+	],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "0.2.2"
 }
