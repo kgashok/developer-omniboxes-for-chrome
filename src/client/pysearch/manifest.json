@@ -2,7 +2,7 @@
    "name": "PySearch",
    "manifest_version": 2,
    "background": {
-      "scripts": [ "config.js", "indexer.js", "renderer.js", "index-data.js", "background.js" ]
+      "scripts": [ "config.js", "indexer.js", "renderer.js", "index-data.js", "predefined.js", "background.js" ]
    },
    "description": "Search Python documentation in the Omnibox.",
    "icons": {
